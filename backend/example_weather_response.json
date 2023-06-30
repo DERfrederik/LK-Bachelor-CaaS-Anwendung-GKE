@@ -1,0 +1,175 @@
+{
+    "status": "ok",
+    "data": {
+        "aqi": 24,
+        "idx": 6143,
+        "attributions": [
+            {
+                "url": "http://www.luft-rlp.de/aktuell/",
+                "name": "Luftreinhaltung Rheinland-Pfalz",
+                "logo": "Germany-RheinlandPfalz.png"
+            },
+            {
+                "url": "https://waqi.info/",
+                "name": "World Air Quality Index Project"
+            }
+        ],
+        "city": {
+            "geo": [
+                50.016667,
+                8.216667
+            ],
+            "name": "Mainz-Mombach, Germany",
+            "url": "https://aqicn.org/city/germany/rheinlandpfalz/mainz-mombach",
+            "location": ""
+        },
+        "dominentpol": "o3",
+        "iaqi": {
+            "co": {
+                "v": 0.1
+            },
+            "dew": {
+                "v": -4
+            },
+            "h": {
+                "v": 52
+            },
+            "no2": {
+                "v": 2.8
+            },
+            "o3": {
+                "v": 24
+            },
+            "p": {
+                "v": 1018.6
+            },
+            "pm10": {
+                "v": 15
+            },
+            "pm25": {
+                "v": 13
+            },
+            "so2": {
+                "v": 0.6
+            },
+            "t": {
+                "v": 5
+            },
+            "w": {
+                "v": 3.6
+            },
+            "wg": {
+                "v": 8.7
+            }
+        },
+        "time": {
+            "s": "2023-03-15 13:00:00",
+            "tz": "+01:00",
+            "v": 1678885200,
+            "iso": "2023-03-15T13:00:00+01:00"
+        },
+        "forecast": {
+            "daily": {
+                "o3": [
+                    {
+                        "avg": 19,
+                        "day": "2023-03-15",
+                        "max": 35,
+                        "min": 6
+                    },
+                    {
+                        "avg": 16,
+                        "day": "2023-03-16",
+                        "max": 34,
+                        "min": 2
+                    },
+                    {
+                        "avg": 18,
+                        "day": "2023-03-17",
+                        "max": 36,
+                        "min": 6
+                    },
+                    {
+                        "avg": 24,
+                        "day": "2023-03-18",
+                        "max": 38,
+                        "min": 14
+                    },
+                    {
+                        "avg": 20,
+                        "day": "2023-03-19",
+                        "max": 20,
+                        "min": 20
+                    }
+                ],
+                "pm10": [
+                    {
+                        "avg": 14,
+                        "day": "2023-03-15",
+                        "max": 22,
+                        "min": 8
+                    },
+                    {
+                        "avg": 22,
+                        "day": "2023-03-16",
+                        "max": 29,
+                        "min": 12
+                    },
+                    {
+                        "avg": 19,
+                        "day": "2023-03-17",
+                        "max": 26,
+                        "min": 10
+                    },
+                    {
+                        "avg": 12,
+                        "day": "2023-03-18",
+                        "max": 16,
+                        "min": 9
+                    },
+                    {
+                        "avg": 12,
+                        "day": "2023-03-19",
+                        "max": 12,
+                        "min": 12
+                    }
+                ],
+                "pm25": [
+                    {
+                        "avg": 44,
+                        "day": "2023-03-15",
+                        "max": 66,
+                        "min": 28
+                    },
+                    {
+                        "avg": 66,
+                        "day": "2023-03-16",
+                        "max": 81,
+                        "min": 42
+                    },
+                    {
+                        "avg": 60,
+                        "day": "2023-03-17",
+                        "max": 75,
+                        "min": 36
+                    },
+                    {
+                        "avg": 42,
+                        "day": "2023-03-18",
+                        "max": 54,
+                        "min": 27
+                    },
+                    {
+                        "avg": 42,
+                        "day": "2023-03-19",
+                        "max": 42,
+                        "min": 40
+                    }
+                ]
+            }
+        },
+        "debug": {
+            "sync": "2023-03-15T21:20:10+09:00"
+        }
+    }
+}

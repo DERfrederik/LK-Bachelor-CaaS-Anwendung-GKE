@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fastapi-configmap
+  namespace: default
+data:
+  MONGO_INITDB_ROOT_USERNAME: admin
+  MONGO_INITDB_ROOT_PASSWORD: admin
+  MONGO_INITDB_DATABASE: db_weather
+
+  MONGO_URL: mongo-service
+  MONGO_PORT: "27017"
+
+  AQIN_KEY: e6e52e8fc683d9fcc03235abe9db9d8bc101230b
+  UmweltstationID: "6143"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-deployment
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: fastapi
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+      - name: fastapi
+        image: lucakoester/lk-bacherlor-backend:v1
+        envFrom:
+          - configMapRef:
+              name: fastapi-configmap
+        ports:
+        - containerPort: 20000
+        volumeMounts:
+        - name: wetter-getter-volume
+          mountPath: /backend
+      volumes:
+      - name: wetter-getter-volume
+        hostPath:
+          path: /run/desktop/mnt/host/c/Users/luk/Documents/VS/wetter_getter_kubernetes/backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+  namespace: default
+spec:
+  selector:
+    app: fastapi
+  ports:
+    - port: 80
+      targetPort: 20000
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: fastapi-stripprefix
+  namespace: default
+spec:
+  stripPrefix: 
+    prefixes:
+      - /api
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: fastapi-ingress
+  namespace: default
+spec:
+  entryPoints: 
+    - websecure
+  routes: 
+    - match: PathPrefix(`/api`)
+      kind: Rule
+      services: 
+        - name: fastapi-service
+          namespace: default
+          port: 80
+      middlewares:
+        - name: fastapi-stripprefix
+          namespace: default

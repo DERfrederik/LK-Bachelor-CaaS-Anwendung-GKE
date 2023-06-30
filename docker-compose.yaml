@@ -1,0 +1,82 @@
+# Vor dem Publishen, müssen die Volumes noch angepasst werde, sodass sie nur von Docker verwaltet werden (Named Volumes) -> das jetzt ist nur für die Entwicklung
+version: '3.8'
+services:
+  database:
+    image: mongo:latest
+    container_name: database
+    env_file:
+      - ./.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME # Hier werden beim docker-compose up direkt die VAriablen einmalig gestezt, nachfolgende Ändernungen am .env haben somit keinen EInfluss -> für unbedingt statische Werte
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+      MONGO_INITDB_DATABASE: $MONGO_INITDB_DATABASE
+    restart: always
+    volumes:
+      - ./database/mongo_volume:/data/db:rw # (/data/db -> gibt image an )
+    networks:
+      # Angeben in welches Netzwerk man möchte. Hätte ich es unten weggealssen, hätte es hier auch nicht hin gemusst
+      - wetter_getter_network
+    #ports:
+    #  - '8001:27017/tcp' #Für Compass nach außen freigeben (27017 gibt image vor)
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    networks:
+      # Angeben in welches Netzwerk man möchte. Hätte ich es unten weggealssen, hätte es hier auch nicht hin gemusst
+      - wetter_getter_network
+      - traefik-global-docker-network
+    #ports:
+    #  - "8000:20000/tcp"
+    labels:
+      - traefik.enable=true
+      #- traefik.http.routers.backend-router.entrypoints=http_entrypoint
+      - traefik.http.routers.backend-router.rule=Host(`api.cablesalad.io`) || (Host(`cablesalad.io`) && PathPrefix(`/api`))
+      - traefik.http.routers.backend-router.tls.certresolver=myresolver
+      #- traefik.http.routers.backend-router.service=backend-service
+      - traefik.http.routers.backend-router.middlewares=backend-middleware
+
+      - traefik.http.middlewares.backend-middleware.stripprefix.prefixes=/api
+      - traefik.http.services.backend-service.loadbalancer.server.port=20000
+      - traefik.docker.network=traefik-global-docker-network
+
+    volumes:
+      - ./backend:/backend
+    env_file:
+      - ./.env
+    environment:
+      - AQIN_KEY=${AQIN_KEY} # Hier wird während der runtime aus der .env gelesen -> für dynamische Werte
+      - UmweltstationID=${UmweltstationID}
+      - MONGODB_CONN_STRING=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGO_URL}:${MONGO_PORT}
+    restart: always
+    depends_on:
+      - database
+
+  webserver:
+    image: nginx:latest
+    container_name: webserver
+    restart: always
+    #ports:
+    #  - 8002:80/tcp
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.webserver-router.rule=Host(`cablesalad.io`)
+      - traefik.http.routers.webserver-router.tls.certresolver=myresolver
+    #  - traefik.http.routers.webserver-router.entrypoints=https_entrypoint
+    #  - traefik.http.routers.webserver-router.service=webserver-service
+      - traefik.http.services.webserver-service.loadbalancer.server.port=80
+
+    volumes:
+      - ./flutter_hello_world/build/web:/usr/share/nginx/html
+    networks:
+      - traefik-global-docker-network
+
+networks:
+  #Hiermit gebe ich den genauen Namen des Netzwerks an. Eigentlich unnötig, denn der defaultName  ist <dir>_default und funktioniert. Das ist also nur zum Verständnis
+  wetter_getter_network:
+    name: my-wetter_getter_network_name
+    driver: bridge #Netzwerk treiber typ
+  traefik-global-docker-network:
+    external: true

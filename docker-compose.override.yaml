@@ -1,0 +1,12 @@
+# Vor dem Publishen, müssen die Volumes noch angepasst werde, sodass sie nur von Docker verwaltet werden (Named Volumes) -> das jetzt ist nur für die Entwicklung
+version: '3.8'
+services:
+  database:
+    ports:
+      - '8001:27017/tcp' #Für Compass nach außen freigeben (27017 gibt image vor)
+  backend:
+    ports:
+      - "8000:20000/tcp"
+  webserver:
+    ports:
+      - 8002:80/tcp

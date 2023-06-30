@@ -1,0 +1,58 @@
+services:
+  reverse_proxy:
+    # Use latest Traefik image available
+    image: "traefik:v2.9"
+    ports:
+      # Listen on port 80, default for HTTP, necessary to redirect to HTTPS
+      - 80:80
+      # Listen Port 443 for https
+      - 443:443
+      # Listen on Port 8080 -> default for traefik gui
+      - 8080:8080
+      # Add Docker as a mounted Volume, so that Traefik can read the labels of other services
+      # EInfach: Das ist die Möglichkeit für Traefik mit Docker zu kommunizieren
+
+    command:
+    #  - "--providers.file.filename=/traefik.yaml"
+      - "--log.level=ERROR"
+
+      - "--api.insecure=true"
+
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+
+      - "--entrypoints.http_entrypoint.address=:80"
+      - "--entrypoints.https_entrypoint.address=:443"
+
+      - --entrypoints.http_entrypoint.http.redirections.entryPoint.to=https_entrypoint
+      - --entrypoints.http_entrypoint.http.redirections.entryPoint.scheme=https
+      - --entrypoints.http_entrypoint.http.redirections.entrypoint.permanent=true
+
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=http_entrypoint"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=luca@klbs.de"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Mounten fer lets encrypt zertifikate
+      - ./letsencrypt:/letsencrypt
+      # Reinmounten des konfigurations files
+      #- ./reverse_proxy/traefik.yaml:/traefik.yaml
+    networks:
+      # Use the public network created to be shared between Traefik
+      # and any other service that needs to be publicly available with HTTPS
+      - traefik-global-docker-network
+    restart: always
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-global-docker-network:
+    # This makes Docker consider the network as a global network.
+    # Normally, a network would only be accessible within the current stack / docker-compose.
+    # However, this network is now installed globally on the Docker Engine,
+    # so it can be accessed from any stack / docker-compose.
+    # Without the external:true, Docker would try to create the network itself,
+    # which it should not do.
+    external: true
