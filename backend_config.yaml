@@ -31,19 +31,20 @@ spec:
     spec:
       containers:
       - name: fastapi
-        image: lucakoester/lk-bacherlor-backend:v1
+        image: lucakoester/lk-bachelor-backend:v1
+        imagePullPolicy: Always
         envFrom:
           - configMapRef:
               name: fastapi-configmap
         ports:
         - containerPort: 20000
-        volumeMounts:
-        - name: wetter-getter-volume
-          mountPath: /backend
-      volumes:
-      - name: wetter-getter-volume
-        hostPath:
-          path: /run/desktop/mnt/host/c/Users/luk/Documents/VS/wetter_getter_kubernetes/backend
+      #   volumeMounts:
+      #   - name: wetter-getter-volume
+      #     mountPath: /backend
+      # volumes:
+      # - name: wetter-getter-volume
+      #   hostPath:
+      #     path: /run/desktop/mnt/host/c/Users/luk/Documents/VS/wetter_getter_kubernetes/backend
 ---
 apiVersion: v1
 kind: Service
@@ -76,7 +77,7 @@ spec:
   entryPoints: 
     - websecure
   routes: 
-    - match: PathPrefix(`/api`)
+    - match: Host(`caas.lk-bachelor.de`) && PathPrefix(`/api`)
       kind: Rule
       services: 
         - name: fastapi-service
@@ -85,3 +86,5 @@ spec:
       middlewares:
         - name: fastapi-stripprefix
           namespace: default
+  tls:
+    certResolver: letsencrypt

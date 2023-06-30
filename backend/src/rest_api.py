@@ -11,8 +11,9 @@ import os
 # Deswegen muss es hier nohcmal angegeben werden
 app = FastAPI(root_path="/api")
 
-#DB connection
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_CONN_STRING"])
+# Database Connection
+connection_str = f"mongodb://{os.environ['MONGO_INITDB_ROOT_USERNAME']}:{os.environ['MONGO_INITDB_ROOT_PASSWORD']}@{os.environ['MONGO_URL']}:{os.environ['MONGO_PORT']}"
+client = motor.motor_asyncio.AsyncIOMotorClient(connection_str)
 db = client.weather_db
 
 #weather = {"datetime":  "2023-03-15T12:11:52.436Z",  "temp": -5, "pressure": 998, "wind": 14}

@@ -15,6 +15,31 @@ metadata:
 data:
   database_url: mongo-service #Name vom Service, welcher für die DB zustänsig ist
 ---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: silver
+provisioner: kubernetes.io/gce-pd
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+parameters:
+  type: pd-standard
+  fstype: ext4
+  replication-type: none
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-storage
+spec:
+  storageClassName: silver
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -57,8 +82,8 @@ spec:
                 key: mongo-init-database
       volumes:
       - name: mongo-volume
-        hostPath:
-          path: /run/desktop/mnt/host/c/Users/luk/Documents/VS/wetter_getter_kubernetes/database/mongo_volume_kubernetes
+        persistentVolumeClaim:
+          claimName: mongo-storage
 ---
 apiVersion: v1
 kind: Service

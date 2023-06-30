@@ -2,7 +2,13 @@
 FROM python:3.11
 
 #Working directory festlegen vom container  (Man kann WORKDIR mehrmals verwenden)
-WORKDIR /backend/src  
+WORKDIR /backend/src 
+
+#Kopieren der src Daten
+COPY ./src/ /backend/src/
+
+# Kopierend es Shell Scripts
+COPY ./start.sh /backend/
 
 # kopiert das Pipfile im backend ordner
 COPY ./Pipfile ./Pipfile.lock /backend/

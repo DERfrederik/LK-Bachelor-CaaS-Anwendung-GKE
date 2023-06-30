@@ -6,7 +6,8 @@ from bson import ObjectId
 from pydantic import BaseModel, Field
 
 # Database Connection
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_CONN_STRING"])
+connection_str = f"mongodb://{os.environ['MONGO_INITDB_ROOT_USERNAME']}:{os.environ['MONGO_INITDB_ROOT_PASSWORD']}@{os.environ['MONGO_URL']}:{os.environ['MONGO_PORT']}"
+client = motor.motor_asyncio.AsyncIOMotorClient(connection_str)
 db = client.weather_db
 
 #Pydantic 

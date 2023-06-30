@@ -1,3 +1,28 @@
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: silver
+# provisioner: kubernetes.io/gce-pd
+# volumeBindingMode: Immediate
+# allowVolumeExpansion: true
+# reclaimPolicy: Delete
+# parameters:
+#   type: pd-standard
+#   fstype: ext4
+#   replication-type: none
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: webapps-storage
+# spec:
+#   storageClassName: silver
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+# ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +32,7 @@ spec:
   selector:
     matchLabels:
       app: nginx
-  replicas: 1 # tells deployment to run 2 pods matching the template
+  replicas: 1
   template:
     metadata:
       labels:
@@ -15,17 +40,18 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:latest
+        image: lucakoester/lk-bachelor-webserver:v1
+        imagePullPolicy: Always
         ports:
           - name: web
             containerPort: 80
-        volumeMounts:
-        - name: wetter-getter-volume
-          mountPath: /usr/share/nginx/html
-      volumes:
-      - name: wetter-getter-volume
-        hostPath:
-          path: /run/desktop/mnt/host/c/Users/luk/Documents/VS/wetter_getter_kubernetes/flutter_hello_world/build/web
+      #   volumeMounts:
+      #   - name: webapps-storage
+      #     mountPath: /usr/share/nginx/html
+      # volumes:
+      # - name: webapps-storage
+      #   persistentVolumeClaim:
+      #     claimName: webapps-storage
 ---
 apiVersion: v1
 kind: Service
@@ -45,12 +71,14 @@ metadata:
   name: nginx-ingress
   namespace: default
 spec:
-  entryPoints: 
+  entryPoints:
     - websecure
-  routes: 
-    - match: PathPrefix(`/`)
+  routes:
+    - match: Host(`caas.lk-bachelor.de`) && PathPrefix(`/`)
       kind: Rule
-      services: 
+      services:
         - name: nginx-service
           namespace: default
           port: 80
+  tls:
+    certResolver: letsencrypt
