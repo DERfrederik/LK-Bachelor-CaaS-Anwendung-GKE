@@ -63,3 +63,5 @@ spec:
       middlewares:
         - name: whoami-stripprefix
           namespace: default
+  tls:
+    certResolver: letsencrypt
