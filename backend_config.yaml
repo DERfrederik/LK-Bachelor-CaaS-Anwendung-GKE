@@ -38,13 +38,6 @@ spec:
               name: fastapi-configmap
         ports:
         - containerPort: 20000
-      #   volumeMounts:
-      #   - name: wetter-getter-volume
-      #     mountPath: /backend
-      # volumes:
-      # - name: wetter-getter-volume
-      #   hostPath:
-      #     path: /run/desktop/mnt/host/c/Users/luk/Documents/VS/wetter_getter_kubernetes/backend
 ---
 apiVersion: v1
 kind: Service

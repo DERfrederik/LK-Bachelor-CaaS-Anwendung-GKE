@@ -1,28 +1,3 @@
-# apiVersion: storage.k8s.io/v1
-# kind: StorageClass
-# metadata:
-#   name: silver
-# provisioner: kubernetes.io/gce-pd
-# volumeBindingMode: Immediate
-# allowVolumeExpansion: true
-# reclaimPolicy: Delete
-# parameters:
-#   type: pd-standard
-#   fstype: ext4
-#   replication-type: none
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: webapps-storage
-# spec:
-#   storageClassName: silver
-#   accessModes:
-#     - ReadWriteOnce
-#   resources:
-#     requests:
-#       storage: 1Gi
-# ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,13 +20,6 @@ spec:
         ports:
           - name: web
             containerPort: 80
-      #   volumeMounts:
-      #   - name: webapps-storage
-      #     mountPath: /usr/share/nginx/html
-      # volumes:
-      # - name: webapps-storage
-      #   persistentVolumeClaim:
-      #     claimName: webapps-storage
 ---
 apiVersion: v1
 kind: Service

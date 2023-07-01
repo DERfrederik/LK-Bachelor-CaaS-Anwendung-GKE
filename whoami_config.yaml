@@ -54,7 +54,7 @@ spec:
   entryPoints: 
     - websecure
   routes: 
-    - match: PathPrefix(`/whoami`)
+    - match:  Host(`caas.lk-bachelor.de`) && PathPrefix(`/whoami`)
       kind: Rule
       services: 
         - name: whoami-service
